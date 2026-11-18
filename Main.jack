@@ -1,0 +1,386 @@
+class Main {
+    function void main() {
+
+        var World world;
+        var Player eco;
+        var Camera camera;
+
+        var Rabbit rabbit1;
+        var Rabbit rabbit2;
+        var Rabbit rabbit3;
+        var Rabbit rabbit4;
+
+        var Fire fire;
+
+        var int key;
+        var int shotCooldown;
+        var int jumpKeyLock;
+        var int startKey;
+        var int seed;
+        var int rescued;
+        var int round;
+        var int totalRescued;
+        var int gameState;
+        var int burnedPercent;
+
+        // --------------------------------
+        // PANTALLA DE BIENVENIDA
+        // --------------------------------
+
+        do Screen.clearScreen();
+
+        do Output.moveCursor(6, 27);
+        do Output.printString("ECORESCATE");
+
+        do Output.moveCursor(8, 22);
+        do Output.printString("GUARDIANES DEL BOSQUE");
+
+        do Output.moveCursor(12, 21);
+        do Output.printString("RESCATA A LOS ANIMALES");
+
+        do Output.moveCursor(15, 23);
+        do Output.printString("PRESIONA UNA TECLA");
+
+        do Output.moveCursor(17, 25);
+        do Output.printString("PARA COMENZAR");
+
+        let startKey = 0;
+
+        while (startKey = 0) {
+            let startKey = Keyboard.keyPressed();
+            do Sys.wait(20);
+        }
+
+        // Semilla inicial
+        let seed = (startKey * 73) + 137;
+
+        // --------------------------------
+        // CREAR MUNDO Y PERSONAJES
+        // --------------------------------
+
+        do Screen.clearScreen();
+
+        let world = World.new();
+        let camera = Camera.new();
+
+        let eco = Player.new(256, 130);
+
+        // Crear cuatro conejos
+        let rabbit1 = Rabbit.new(
+            90, 160, 0, 95, seed + 11
+        );
+
+        let rabbit2 = Rabbit.new(
+            800, 120, 2, 110, seed + 29
+        );
+
+        let rabbit3 = Rabbit.new(
+            250, 390, 1, 85, seed + 47
+        );
+
+        let rabbit4 = Rabbit.new(
+            800, 420, 3, 100, seed + 67
+        );
+
+        // Crear sistema de incendios
+        let fire = Fire.new(seed + 89);
+
+        let rescued = 0;
+        let round = 1;
+        let totalRescued = 0;
+        let gameState = 0;
+        let burnedPercent = 0;
+        let shotCooldown = 0;
+        let jumpKeyLock = 0;
+
+        // Dibujar escenario inicial
+        do world.draw(camera);
+        do eco.draw(camera);
+
+        do rabbit1.draw(camera);
+        do rabbit2.draw(camera);
+        do rabbit3.draw(camera);
+        do rabbit4.draw(camera);
+
+        // --------------------------------
+        // BUCLE PRINCIPAL
+        // --------------------------------
+
+        while (gameState = 0) {
+
+            let key = Keyboard.keyPressed();
+
+            // SALTO ESPECIAL: cuesta 50 puntos.
+            // Se activa una sola vez por pulsacion de espacio.
+            if (key = 32) {
+                if (jumpKeyLock = 0) {
+                    if (~eco.isJumping()) {
+                        if (fire.spendScore(50)) {
+                            do eco.startJump();
+                        }
+                    }
+                    let jumpKeyLock = 1;
+                }
+            } else {
+                let jumpKeyLock = 0;
+            }
+
+            // DISPARO AUTOMATICO MIENTRAS SE MANTIENE Z.
+            // Hay una pausa corta entre disparos.
+
+            if (shotCooldown > 0) {
+                let shotCooldown = shotCooldown - 1;
+            }
+
+            if ((key = 90) | (key = 122)) {
+                if (shotCooldown = 0) {
+                    do fire.shoot(eco);
+                    let shotCooldown = 5;
+                }
+            }
+
+            // MOVIMIENTO DE ECO
+            // Velocidad de movimiento: 6
+
+            if (key = 130) {
+                do eco.move(-6, 0, world);
+            }
+
+            if (key = 131) {
+                do eco.move(0, -6, world);
+            }
+
+            if (key = 132) {
+                do eco.move(6, 0, world);
+            }
+
+            if (key = 133) {
+                do eco.move(0, 6, world);
+            }
+
+            // Avanzar la animacion y la fisica del salto.
+            do eco.updateJump();
+
+            // La camara sigue a ECO
+            do camera.follow(
+                eco.getX(), eco.getY()
+            );
+
+            // --------------------------------
+            // MOVIMIENTO DE LOS CONEJOS
+            // --------------------------------
+
+            do rabbit1.move(
+                world, rabbit2, rabbit3, rabbit4
+            );
+
+            do rabbit2.move(
+                world, rabbit1, rabbit3, rabbit4
+            );
+
+            do rabbit3.move(
+                world, rabbit1, rabbit2, rabbit4
+            );
+
+            do rabbit4.move(
+                world, rabbit1, rabbit2, rabbit3
+            );
+
+            // --------------------------------
+            // RESCATAR CONEJOS
+            // --------------------------------
+
+            if (rabbit1.isNear(
+                eco.getX(), eco.getY()
+            )) {
+                do rabbit1.rescue();
+
+                // El cuarto conejo rescatado de cada ronda
+                // recibe 60 puntos, sin importar cual sea.
+                if (rescued = 3) {
+                    do fire.addScore(60);
+                } else {
+                    do fire.addScore(30);
+                }
+
+                let rescued = rescued + 1;
+                let totalRescued = totalRescued + 1;
+            }
+
+            if (rabbit2.isNear(
+                eco.getX(), eco.getY()
+            )) {
+                do rabbit2.rescue();
+
+                // El cuarto conejo rescatado de cada ronda
+                // recibe 60 puntos, sin importar cual sea.
+                if (rescued = 3) {
+                    do fire.addScore(60);
+                } else {
+                    do fire.addScore(30);
+                }
+
+                let rescued = rescued + 1;
+                let totalRescued = totalRescued + 1;
+            }
+
+            if (rabbit3.isNear(
+                eco.getX(), eco.getY()
+            )) {
+                do rabbit3.rescue();
+
+                // El cuarto conejo rescatado de cada ronda
+                // recibe 60 puntos, sin importar cual sea.
+                if (rescued = 3) {
+                    do fire.addScore(60);
+                } else {
+                    do fire.addScore(30);
+                }
+
+                let rescued = rescued + 1;
+                let totalRescued = totalRescued + 1;
+            }
+
+            if (rabbit4.isNear(
+                eco.getX(), eco.getY()
+            )) {
+                do rabbit4.rescue();
+
+                // El cuarto conejo rescatado de cada ronda
+                // recibe 60 puntos, sin importar cual sea.
+                if (rescued = 3) {
+                    do fire.addScore(60);
+                } else {
+                    do fire.addScore(30);
+                }
+
+                let rescued = rescued + 1;
+                let totalRescued = totalRescued + 1;
+            }
+
+            // --------------------------------
+            // COMPLETAR UNA RONDA
+            // --------------------------------
+
+            if (rescued = 4) {
+
+                let rescued = 0;
+                let round = round + 1;
+
+                let seed = seed + 193 + (round * 47);
+                let seed = seed - ((seed / 997) * 997);
+
+                do rabbit1.reset(
+                    90, 160, 0, 95, seed + 11
+                );
+
+                do rabbit2.reset(
+                    800, 120, 2, 110, seed + 29
+                );
+
+                do rabbit3.reset(
+                    250, 390, 1, 85, seed + 47
+                );
+
+                do rabbit4.reset(
+                    800, 420, 3, 100, seed + 67
+                );
+            }
+
+            // --------------------------------
+            // ACTUALIZAR INCENDIO
+            // --------------------------------
+
+            // Actualizar la gota antes del temporizador,
+            // para permitir apagar el fuego en el ultimo instante.
+            do fire.updateWater();
+            do fire.update(world);
+
+            // --------------------------------
+            // CONDICIONES DE VICTORIA Y DERROTA
+            // --------------------------------
+
+            // La victoria tiene prioridad si ambas condiciones
+            // se alcanzan durante el mismo ciclo.
+            if (fire.getScore() > 999) {
+                let gameState = 1;
+            } else {
+                // Game Over cuando se queman 28 objetos.
+                if (world.getBurnedCount() > 27) {
+                    let gameState = 2;
+                }
+            }
+
+            // --------------------------------
+            // DIBUJAR TODO
+            // --------------------------------
+
+            do world.draw(camera);
+
+            // Dibujar fuego y gota de agua
+            do fire.draw(camera);
+            do fire.drawWater(camera);
+
+            // Dibujar cruceta indicadora
+            do fire.drawIndicator(eco);
+
+            // Mostrar la puntuacion con segmentos graficos.
+            do fire.drawScore();
+
+            // Dibujar ECO
+            do eco.draw(camera);
+
+            // Dibujar conejos
+            do rabbit1.draw(camera);
+            do rabbit2.draw(camera);
+            do rabbit3.draw(camera);
+            do rabbit4.draw(camera);
+
+            do Sys.wait(50);
+        }
+
+        // --------------------------------
+        // PANTALLA FINAL
+        // gameState = 1: victoria
+        // gameState = 2: game over
+        // --------------------------------
+
+        do Screen.clearScreen();
+
+        if (gameState = 1) {
+            do Output.moveCursor(5, 28);
+            do Output.printString("VICTORIA!");
+            do Output.moveCursor(8, 17);
+            do Output.printString("SALVASTE EL BOSQUE");
+        } else {
+            do Output.moveCursor(5, 28);
+            do Output.printString("GAME OVER");
+            do Output.moveCursor(8, 15);
+            do Output.printString("EL INCENDIO AVANZO");
+        }
+
+        do Output.moveCursor(12, 16);
+        do Output.printString("PUNTUACION FINAL:");
+        do Output.printInt(fire.getScore());
+
+        do Output.moveCursor(14, 16);
+        do Output.printString("CONEJOS SALVADOS:");
+        do Output.printInt(totalRescued);
+
+        do Output.moveCursor(16, 16);
+        do Output.printString("OBJETOS QUEMADOS:");
+        do Output.printInt(world.getBurnedCount());
+
+        do Output.moveCursor(18, 16);
+        do Output.printString("DE UN TOTAL DE 77");
+
+        do Output.moveCursor(21, 16);
+        do Output.printString("GRACIAS POR JUGAR");
+
+        while (true) {
+            do Sys.wait(100);
+        }
+
+        return;
+    }
+}

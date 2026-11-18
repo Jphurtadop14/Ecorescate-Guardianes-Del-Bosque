@@ -1,0 +1,946 @@
+
+class World {
+
+    field int unused;
+    field Array burnedX;
+    field Array burnedY;
+    field int burnedCount;
+
+    constructor World new() {
+        let unused = 0;
+        let burnedX = Array.new(77);
+        let burnedY = Array.new(77);
+        let burnedCount = 0;
+        return this;
+    }
+
+    // =====================================
+    // DIBUJAR EL MUNDO
+    // =====================================
+
+    method void draw(Camera camera) {
+        var int camX;
+        var int camY;
+
+        let camX = camera.getX();
+        let camY = camera.getY();
+
+        do Screen.clearScreen();
+
+        // Marco
+        do Screen.setColor(true);
+        do Screen.drawRectangle(3, 3, 508, 252);
+
+        // Fondo
+        do Screen.setColor(false);
+        do Screen.drawRectangle(7, 7, 504, 248);
+
+        // Cuatro zonas
+        do drawForest(camX, camY);
+        do drawVillage(camX, camY);
+        do drawClearing(camX, camY);
+        do drawRockyZone(camX, camY);
+
+        return;
+    }
+
+    // =====================================
+    // ZONA 1: BOSQUE ESMERALDA
+    // =====================================
+
+    method void drawForest(int camX, int camY) {
+
+        // Arboles
+        do drawBurnableTree(45, 55, camX, camY);
+        do drawBurnableTree(115, 55, camX, camY);
+        do drawBurnableTree(25, 105, camX, camY);
+        do drawBurnableTree(35, 205, camX, camY);
+        do drawBurnableTree(110, 205, camX, camY);
+        do drawBurnableTree(225, 55, camX, camY);
+        do drawBurnableTree(225, 205, camX, camY);
+
+        // Iglesia y zona verde en el espacio central
+        do drawChurch(350, 65, camX, camY);
+        do drawBurnableTree(300, 55, camX, camY);
+        do drawBurnableTree(455, 190, camX, camY);
+
+        // Casa
+        do drawBurnableHouse(155, 65, camX, camY);
+
+        // Arbustos
+        do drawBurnableBush(205, 140, camX, camY);
+        do drawBurnableBush(175, 175, camX, camY);
+        do drawBurnableBush(75, 145, camX, camY);
+        do drawBurnableBush(195, 220, camX, camY);
+        do drawBurnableBush(320, 150, camX, camY);
+        do drawBurnableBush(425, 140, camX, camY);
+
+        // Flores
+        do drawBurnableFlowers(155, 185, camX, camY);
+        do drawBurnableFlowers(95, 95, camX, camY);
+        do drawBurnableFlowers(220, 125, camX, camY);
+        do drawBurnableFlowers(75, 225, camX, camY);
+        do drawBurnableFlowers(350, 155, camX, camY);
+        do drawBurnableFlowers(395, 180, camX, camY);
+
+        // Rocas
+        do drawRock(205, 95, camX, camY);
+        do drawRock(150, 225, camX, camY);
+
+        return;
+    }
+
+    // =====================================
+    // ZONA 2: VILLA ROBLE
+    // =====================================
+
+    method void drawVillage(int camX, int camY) {
+
+        // Casas
+        do drawBurnableHouse(665, 55, camX, camY);
+        do drawBurnableHouse(850, 165, camX, camY);
+
+        // Arboles
+        do drawBurnableTree(570, 55, camX, camY);
+        do drawBurnableTree(620, 125, camX, camY);
+        do drawBurnableTree(720, 45, camX, camY);
+        do drawBurnableTree(890, 55, camX, camY);
+        do drawBurnableTree(970, 55, camX, camY);
+        do drawBurnableTree(545, 205, camX, camY);
+        do drawBurnableTree(950, 220, camX, camY);
+        do drawBurnableTree(990, 145, camX, camY);
+
+        // Arbustos y jardines
+        do drawBurnableBush(640, 175, camX, camY);
+        do drawBurnableBush(745, 100, camX, camY);
+        do drawBurnableBush(800, 65, camX, camY);
+        do drawBurnableBush(920, 115, camX, camY);
+        do drawBurnableBush(710, 210, camX, camY);
+        do drawBurnableBush(980, 215, camX, camY);
+
+        // Flores
+        do drawBurnableFlowers(790, 75, camX, camY);
+        do drawBurnableFlowers(820, 220, camX, camY);
+        do drawBurnableFlowers(690, 185, camX, camY);
+        do drawBurnableFlowers(910, 90, camX, camY);
+        do drawBurnableFlowers(570, 165, camX, camY);
+
+        // Rocas
+        do drawRock(750, 205, camX, camY);
+
+        return;
+    }
+
+    // =====================================
+    // ZONA 3: CLARO DE LOS CONEJOS
+    // =====================================
+
+    method void drawClearing(int camX, int camY) {
+
+        // Casa
+        do drawBurnableHouse(150, 320, camX, camY);
+
+        // Arboles
+        do drawBurnableTree(45, 300, camX, camY);
+        do drawBurnableTree(35, 455, camX, camY);
+        do drawBurnableTree(105, 465, camX, camY);
+        do drawBurnableTree(205, 475, camX, camY);
+        do drawBurnableTree(250, 300, camX, camY);
+        do drawBurnableTree(460, 310, camX, camY);
+        do drawBurnableTree(420, 465, camX, camY);
+
+        // Arbustos
+        do drawBurnableBush(220, 300, camX, camY);
+        do drawBurnableBush(300, 450, camX, camY);
+        do drawBurnableBush(65, 350, camX, camY);
+        do drawBurnableBush(185, 390, camX, camY);
+        do drawBurnableBush(270, 420, camX, camY);
+        do drawBurnableBush(440, 420, camX, camY);
+
+        // Flores
+        do drawBurnableFlowers(250, 350, camX, camY);
+        do drawBurnableFlowers(390, 450, camX, camY);
+        do drawBurnableFlowers(80, 420, camX, camY);
+        do drawBurnableFlowers(280, 410, camX, camY);
+        do drawBurnableFlowers(440, 370, camX, camY);
+
+        // Rocas
+        do drawRock(430, 350, camX, camY);
+        do drawRock(300, 300, camX, camY);
+
+        // Estanque
+        do drawPond(360, 355, camX, camY);
+
+        return;
+    }
+
+    // =====================================
+    // ZONA 4: MONTANA ROCOSA
+    // =====================================
+
+    method void drawRockyZone(int camX, int camY) {
+
+        // Cabana
+        do drawBurnableHouse(665, 320, camX, camY);
+
+        // Arboles
+        do drawBurnableTree(570, 300, camX, camY);
+        do drawBurnableTree(550, 420, camX, camY);
+        do drawBurnableTree(620, 465, camX, camY);
+        do drawBurnableTree(690, 470, camX, camY);
+        do drawBurnableTree(890, 300, camX, camY);
+        do drawBurnableTree(970, 300, camX, camY);
+        do drawBurnableTree(950, 465, camX, camY);
+
+        // Rocas
+        do drawRock(760, 310, camX, camY);
+        do drawRock(800, 345, camX, camY);
+        do drawRock(900, 400, camX, camY);
+        do drawRock(740, 460, camX, camY);
+        do drawRock(980, 390, camX, camY);
+
+        // Arbustos
+        do drawBurnableBush(600, 360, camX, camY);
+        do drawBurnableBush(850, 465, camX, camY);
+        do drawBurnableBush(700, 420, camX, camY);
+        do drawBurnableBush(930, 450, camX, camY);
+
+        // Flores
+        do drawBurnableFlowers(930, 330, camX, camY);
+        do drawBurnableFlowers(820, 430, camX, camY);
+        do drawBurnableFlowers(580, 460, camX, camY);
+
+        return;
+    }
+
+    // =====================================
+    // CONTROL DE OBJETOS QUE SE QUEMAN
+    // =====================================
+
+    method void burnObject(int objectX, int objectY) {
+        var int i;
+        var boolean alreadyBurned;
+
+        let i = 0;
+        let alreadyBurned = false;
+        while (i < burnedCount) {
+            if ((burnedX[i] = objectX) & (burnedY[i] = objectY)) {
+                let alreadyBurned = true;
+            }
+            let i = i + 1;
+        }
+
+        if ((~alreadyBurned) & (burnedCount < 77)) {
+            let burnedX[burnedCount] = objectX;
+            let burnedY[burnedCount] = objectY;
+            let burnedCount = burnedCount + 1;
+        }
+        return;
+    }
+
+    // Cantidad de objetos inflamables que ya se quemaron.
+    method int getBurnedCount() {
+        return burnedCount;
+    }
+
+    // Total de objetos inflamables dibujados en las cuatro regiones.
+    // 31 arboles + 5 casas + 22 arbustos + 19 grupos de flores.
+    method int getTotalBurnable() {
+        return 77;
+    }
+
+    method boolean isBurned(int objectX, int objectY) {
+        var int i;
+        let i = 0;
+        while (i < burnedCount) {
+            if ((burnedX[i] = objectX) & (burnedY[i] = objectY)) {
+                return true;
+            }
+            let i = i + 1;
+        }
+        return false;
+    }
+
+    method void drawBurnableTree(int x, int y, int camX, int camY) {
+        if (~isBurned(x, y)) { do drawTree(x, y, camX, camY); }
+        return;
+    }
+
+    method void drawBurnableHouse(int x, int y, int camX, int camY) {
+        if (~isBurned(x, y)) { do drawHouse(x, y, camX, camY); }
+        return;
+    }
+
+    method void drawBurnableBush(int x, int y, int camX, int camY) {
+        if (~isBurned(x, y)) { do drawBush(x, y, camX, camY); }
+        return;
+    }
+
+    method void drawBurnableFlowers(int x, int y, int camX, int camY) {
+        if (~isBurned(x, y)) { do drawFlowers(x, y, camX, camY); }
+        return;
+    }
+
+    method boolean blockedObject(int px, int py, int objectX, int objectY,
+                                 int left, int right, int top, int bottom) {
+        if (isBurned(objectX, objectY)) { return false; }
+        return overlaps(px, py, left, right, top, bottom);
+    }
+
+    // =====================================
+    // DIBUJAR ARBOLES
+    // =====================================
+
+    method void drawTree(int cx, int cy,
+                         int camX, int camY) {
+
+        let cx = cx - camX;
+        let cy = cy - camY;
+
+        if (cx > 19) {
+            if (cx < 493) {
+                if (cy > 19) {
+                    if (cy < 237) {
+
+                        do Screen.setColor(true);
+
+                        do Screen.drawRectangle(
+                            cx-2, cy+4, cx+2, cy+12
+                        );
+
+                        do Screen.drawCircle(cx, cy, 9);
+
+                        do Screen.setColor(false);
+                        do Screen.drawCircle(cx, cy, 3);
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR CASAS
+    // =====================================
+
+    method void drawHouse(int hx, int hy,
+                          int camX, int camY) {
+
+        let hx = hx - camX;
+        let hy = hy - camY;
+
+        if (hx > 10) {
+            if (hx < 463) {
+                if (hy > 10) {
+                    if (hy < 215) {
+
+                        do Screen.setColor(true);
+
+                        // Paredes
+                        do Screen.drawRectangle(
+                            hx+2, hy+8, hx+36, hy+28
+                        );
+
+                        do Screen.setColor(false);
+                        do Screen.drawRectangle(
+                            hx+5, hy+11, hx+33, hy+25
+                        );
+
+                        // Techo
+                        do Screen.setColor(true);
+                        do Screen.drawLine(
+                            hx, hy+9, hx+19, hy
+                        );
+                        do Screen.drawLine(
+                            hx+19, hy, hx+38, hy+9
+                        );
+                        do Screen.drawLine(
+                            hx+3, hy+9, hx+35, hy+9
+                        );
+
+                        // Chimenea
+                        do Screen.drawRectangle(
+                            hx+27, hy+2, hx+32, hy+8
+                        );
+
+                        // Ventanas
+                        do Screen.setColor(false);
+                        do Screen.drawRectangle(
+                            hx+7, hy+14, hx+13, hy+20
+                        );
+                        do Screen.drawRectangle(
+                            hx+25, hy+14, hx+31, hy+20
+                        );
+
+                        // Marcos
+                        do Screen.setColor(true);
+                        do Screen.drawLine(
+                            hx+10, hy+14, hx+10, hy+20
+                        );
+                        do Screen.drawLine(
+                            hx+7, hy+17, hx+13, hy+17
+                        );
+                        do Screen.drawLine(
+                            hx+28, hy+14, hx+28, hy+20
+                        );
+                        do Screen.drawLine(
+                            hx+25, hy+17, hx+31, hy+17
+                        );
+
+                        // Puerta
+                        do Screen.drawRectangle(
+                            hx+16, hy+18, hx+22, hy+28
+                        );
+
+                        do Screen.setColor(false);
+                        do Screen.drawCircle(
+                            hx+20, hy+23, 1
+                        );
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR IGLESIA DEL BOSQUE
+    // =====================================
+
+    method void drawChurch(int ix, int iy,
+                           int camX, int camY) {
+
+        let ix = ix - camX;
+        let iy = iy - camY;
+
+        // Dibujar solamente cuando cabe en pantalla
+        if (ix > 55) {
+            if (ix < 435) {
+                if (iy > 30) {
+                    if (iy < 165) {
+
+                        do Screen.setColor(true);
+
+                        // Cuerpo principal
+                        do Screen.drawRectangle(
+                            ix+8, iy+27, ix+50, iy+62
+                        );
+
+                        // Interior de las paredes
+                        do Screen.setColor(false);
+                        do Screen.drawRectangle(
+                            ix+12, iy+31, ix+46, iy+58
+                        );
+
+                        // Techo principal
+                        do Screen.setColor(true);
+                        do Screen.drawLine(
+                            ix+5, iy+28, ix+29, iy+15
+                        );
+                        do Screen.drawLine(
+                            ix+29, iy+15, ix+53, iy+28
+                        );
+
+                        // Torre del campanario
+                        do Screen.drawRectangle(
+                            ix+21, iy+3, ix+37, iy+26
+                        );
+
+                        do Screen.setColor(false);
+                        do Screen.drawRectangle(
+                            ix+25, iy+8, ix+33, iy+19
+                        );
+
+                        // Techo de la torre
+                        do Screen.setColor(true);
+                        do Screen.drawLine(
+                            ix+18, iy+4, ix+29, iy-5
+                        );
+                        do Screen.drawLine(
+                            ix+29, iy-5, ix+40, iy+4
+                        );
+
+                        // Puerta principal
+                        do Screen.drawRectangle(
+                            ix+24, iy+43, ix+34, iy+62
+                        );
+
+                        // Ventanas
+                        do Screen.setColor(false);
+                        do Screen.drawRectangle(
+                            ix+13, iy+34, ix+19, iy+42
+                        );
+                        do Screen.drawRectangle(
+                            ix+39, iy+34, ix+45, iy+42
+                        );
+
+                        // Cruz sobre la torre
+                        do Screen.setColor(true);
+                        do Screen.drawLine(
+                            ix+29, iy-12, ix+29, iy-6
+                        );
+                        do Screen.drawLine(
+                            ix+26, iy-9, ix+32, iy-9
+                        );
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR ARBUSTOS
+    // =====================================
+
+    method void drawBush(int bx, int by,
+                         int camX, int camY) {
+
+        let bx = bx - camX;
+        let by = by - camY;
+
+        if (bx > 20) {
+            if (bx < 492) {
+                if (by > 20) {
+                    if (by < 236) {
+
+                        do Screen.setColor(true);
+
+                        do Screen.drawCircle(bx-5, by, 5);
+                        do Screen.drawCircle(bx+5, by, 5);
+                        do Screen.drawCircle(bx, by-3, 6);
+
+                        do Screen.setColor(false);
+                        do Screen.drawCircle(bx, by-2, 2);
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR ROCAS
+    // =====================================
+
+    method void drawRock(int rx, int ry,
+                         int camX, int camY) {
+
+        let rx = rx - camX;
+        let ry = ry - camY;
+
+        if (rx > 15) {
+            if (rx < 497) {
+                if (ry > 15) {
+                    if (ry < 241) {
+
+                        do Screen.setColor(true);
+
+                        do Screen.drawLine(
+                            rx-7, ry, rx-3, ry-6
+                        );
+                        do Screen.drawLine(
+                            rx-3, ry-6, rx+4, ry-6
+                        );
+                        do Screen.drawLine(
+                            rx+4, ry-6, rx+8, ry
+                        );
+                        do Screen.drawLine(
+                            rx+8, ry, rx+5, ry+6
+                        );
+                        do Screen.drawLine(
+                            rx+5, ry+6, rx-5, ry+6
+                        );
+                        do Screen.drawLine(
+                            rx-5, ry+6, rx-7, ry
+                        );
+
+                        do Screen.drawLine(
+                            rx-3, ry-3, rx+1, ry-5
+                        );
+                        do Screen.drawLine(
+                            rx+1, ry-5, rx+4, ry-3
+                        );
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR FLORES Y HIERBA
+    // =====================================
+
+    method void drawFlowers(int fx, int fy,
+                            int camX, int camY) {
+
+        let fx = fx - camX;
+        let fy = fy - camY;
+
+        if (fx > 12) {
+            if (fx < 490) {
+                if (fy > 12) {
+                    if (fy < 240) {
+
+                        do Screen.setColor(true);
+
+                        do Screen.drawCircle(fx, fy, 2);
+                        do Screen.drawCircle(fx+9, fy+5, 2);
+                        do Screen.drawCircle(fx-8, fy+7, 2);
+
+                        do Screen.drawLine(
+                            fx, fy+2, fx, fy+7
+                        );
+
+                        do Screen.drawLine(
+                            fx+9, fy+7, fx+9, fy+12
+                        );
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR ESTANQUE
+    // =====================================
+
+    method void drawPond(int px, int py,
+                         int camX, int camY) {
+
+        let px = px - camX;
+        let py = py - camY;
+
+        if (px > 25) {
+            if (px < 475) {
+                if (py > 25) {
+                    if (py < 225) {
+
+                        do Screen.setColor(true);
+                        do Screen.drawCircle(px, py, 15);
+
+                        do Screen.setColor(false);
+                        do Screen.drawCircle(px, py, 11);
+
+                        do Screen.setColor(true);
+                        do Screen.drawLine(
+                            px-5, py-2, px+4, py-2
+                        );
+                        do Screen.drawLine(
+                            px-3, py+3, px+6, py+3
+                        );
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // COLISIONES GENERALES
+    // =====================================
+
+    method boolean isBlocked(int px, int py) {
+
+        if (blockedForest(px, py)) {
+            return true;
+        }
+
+        if (blockedVillage(px, py)) {
+            return true;
+        }
+
+        if (blockedClearing(px, py)) {
+            return true;
+        }
+
+        if (blockedRocky(px, py)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // COLISIONES DEL BOSQUE
+    // =====================================
+
+    method boolean blockedForest(int px, int py) {
+
+        // Arboles originales
+        if (blockedObject(px, py, 45, 55, 33, 57, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 115, 55, 103, 127, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 25, 105, 13, 37, 93, 120)) {
+            return true;
+        }
+        if (blockedObject(px, py, 35, 205, 23, 47, 193, 220)) {
+            return true;
+        }
+        if (blockedObject(px, py, 110, 205, 98, 122, 193, 220)) {
+            return true;
+        }
+        if (blockedObject(px, py, 225, 55, 213, 237, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 225, 205, 213, 237, 193, 220)) {
+            return true;
+        }
+
+        // Arboles nuevos alrededor de la iglesia
+        if (blockedObject(px, py, 300, 55, 288, 312, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 455, 190, 443, 467, 178, 205)) {
+            return true;
+        }
+
+        // Iglesia
+        if (overlaps(px, py, 354, 402, 75, 130)) {
+            return true;
+        }
+
+        // Casa
+        if (blockedObject(px, py, 155, 65, 141, 215, 60, 103)) {
+            return true;
+        }
+
+        // Rocas
+        if (overlaps(px, py, 195, 215, 85, 105)) {
+            return true;
+        }
+        if (overlaps(px, py, 140, 160, 215, 235)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // COLISIONES DE VILLA ROBLE
+    // =====================================
+
+    method boolean blockedVillage(int px, int py) {
+
+        // Arboles
+        if (blockedObject(px, py, 570, 55, 558, 582, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 620, 125, 608, 632, 113, 140)) {
+            return true;
+        }
+        if (blockedObject(px, py, 720, 45, 708, 732, 33, 60)) {
+            return true;
+        }
+        if (blockedObject(px, py, 890, 55, 878, 902, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 970, 55, 958, 982, 43, 70)) {
+            return true;
+        }
+        if (blockedObject(px, py, 545, 205, 533, 557, 193, 220)) {
+            return true;
+        }
+        if (blockedObject(px, py, 950, 220, 938, 962, 208, 235)) {
+            return true;
+        }
+        if (blockedObject(px, py, 990, 145, 978, 1002, 133, 160)) {
+            return true;
+        }
+
+        // Casas
+        if (blockedObject(px, py, 665, 55, 651, 725, 50, 93)) {
+            return true;
+        }
+        if (blockedObject(px, py, 850, 165, 836, 910, 160, 203)) {
+            return true;
+        }
+
+        // Roca
+        if (overlaps(px, py, 740, 760, 195, 215)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // COLISIONES DEL CLARO
+    // =====================================
+
+    method boolean blockedClearing(int px, int py) {
+
+        // Arboles
+        if (blockedObject(px, py, 45, 300, 33, 57, 288, 315)) {
+            return true;
+        }
+        if (blockedObject(px, py, 35, 455, 23, 47, 443, 470)) {
+            return true;
+        }
+        if (blockedObject(px, py, 105, 465, 93, 117, 453, 480)) {
+            return true;
+        }
+        if (blockedObject(px, py, 205, 475, 193, 217, 463, 490)) {
+            return true;
+        }
+        if (blockedObject(px, py, 250, 300, 238, 262, 288, 315)) {
+            return true;
+        }
+        if (blockedObject(px, py, 460, 310, 448, 472, 298, 325)) {
+            return true;
+        }
+        if (blockedObject(px, py, 420, 465, 408, 432, 453, 480)) {
+            return true;
+        }
+
+        // Casa
+        if (blockedObject(px, py, 150, 320, 136, 210, 315, 358)) {
+            return true;
+        }
+
+        // Rocas
+        if (overlaps(px, py, 420, 440, 340, 360)) {
+            return true;
+        }
+        if (overlaps(px, py, 290, 310, 290, 310)) {
+            return true;
+        }
+
+        // Estanque
+        if (overlaps(px, py, 335, 385, 330, 380)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // COLISIONES DE LA MONTANA ROCOSA
+    // =====================================
+
+    method boolean blockedRocky(int px, int py) {
+
+        // Arboles
+        if (blockedObject(px, py, 570, 300, 558, 582, 288, 315)) {
+            return true;
+        }
+        if (blockedObject(px, py, 550, 420, 538, 562, 408, 435)) {
+            return true;
+        }
+        if (blockedObject(px, py, 620, 465, 608, 632, 453, 480)) {
+            return true;
+        }
+        if (blockedObject(px, py, 690, 470, 678, 702, 458, 485)) {
+            return true;
+        }
+        if (blockedObject(px, py, 890, 300, 878, 902, 288, 315)) {
+            return true;
+        }
+        if (blockedObject(px, py, 970, 300, 958, 982, 288, 315)) {
+            return true;
+        }
+        if (blockedObject(px, py, 950, 465, 938, 962, 453, 480)) {
+            return true;
+        }
+
+        // Casa
+        if (blockedObject(px, py, 665, 320, 651, 725, 315, 358)) {
+            return true;
+        }
+
+        // Rocas
+        if (overlaps(px, py, 750, 770, 300, 320)) {
+            return true;
+        }
+        if (overlaps(px, py, 790, 810, 335, 355)) {
+            return true;
+        }
+        if (overlaps(px, py, 890, 910, 390, 410)) {
+            return true;
+        }
+        if (overlaps(px, py, 730, 750, 450, 470)) {
+            return true;
+        }
+        if (overlaps(px, py, 970, 990, 380, 400)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // COLISIONES DURANTE EL SALTO
+    // ECO puede pasar sobre arboles y rocas,
+    // pero no sobre casas, iglesia ni estanque.
+    // =====================================
+
+    method boolean isBlockedDuringJump(int px, int py) {
+
+        // Iglesia del bosque.
+        if (overlaps(px, py, 354, 402, 75, 130)) {
+            return true;
+        }
+
+        // Casas: si una casa se quemo, deja de bloquear.
+        if (blockedObject(px, py, 155, 65, 141, 215, 60, 103)) {
+            return true;
+        }
+
+        if (blockedObject(px, py, 665, 55, 651, 725, 50, 93)) {
+            return true;
+        }
+
+        if (blockedObject(px, py, 850, 165, 836, 910, 160, 203)) {
+            return true;
+        }
+
+        if (blockedObject(px, py, 150, 320, 136, 210, 315, 358)) {
+            return true;
+        }
+
+        if (blockedObject(px, py, 665, 320, 651, 725, 315, 358)) {
+            return true;
+        }
+
+        // Estanque del claro.
+        if (overlaps(px, py, 335, 385, 330, 380)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // COMPROBAR SI UN PUNTO ESTA DENTRO
+    // DE UN RECTANGULO
+    // =====================================
+
+    method boolean overlaps(int px, int py,
+                            int left, int right,
+                            int top, int bottom) {
+
+        if (px > left) {
+            if (px < right) {
+                if (py > top) {
+                    if (py < bottom) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+}

@@ -1,0 +1,300 @@
+class Rabbit {
+
+    field int x;
+    field int y;
+    field int direction;
+    field int steps;
+    field int changeAfter;
+    field int randomState;
+    field boolean active;
+
+    constructor Rabbit new(int startX, int startY,
+                           int startDirection, int duration,
+                           int seed) {
+
+        let x = startX;
+        let y = startY;
+        let direction = startDirection;
+        let steps = 0;
+        let changeAfter = duration;
+        let active = true;
+        let randomState = seed;
+
+        let randomState = randomState
+                          - ((randomState / 997) * 997);
+
+        do chooseDirection();
+
+        return this;
+    }
+
+    // =====================================
+    // GENERAR DIRECCION PSEUDOALEATORIA
+    // =====================================
+
+    method void chooseDirection() {
+
+        var int previousDirection;
+
+        let previousDirection = direction;
+
+        let randomState = (randomState * 37) + 17;
+        let randomState = randomState
+                          - ((randomState / 997) * 997);
+
+        let direction = randomState
+                        - ((randomState / 4) * 4);
+
+        if (direction = previousDirection) {
+            let direction = direction + 1;
+
+            if (direction > 3) {
+                let direction = 0;
+            }
+        }
+
+        let randomState = (randomState * 37) + 17;
+        let randomState = randomState
+                          - ((randomState / 997) * 997);
+
+        let changeAfter = 35
+                          + (randomState
+                          - ((randomState / 75) * 75));
+
+        return;
+    }
+
+    // =====================================
+    // MOVIMIENTO Y COLISIONES
+    // =====================================
+
+    method void move(World world, Rabbit other1,
+                     Rabbit other2, Rabbit other3) {
+
+        var int nextX;
+        var int nextY;
+        var boolean blocked;
+
+        if (active) {
+
+            let nextX = x;
+            let nextY = y;
+            let blocked = false;
+
+            let steps = steps + 1;
+
+            if (steps > changeAfter) {
+                do chooseDirection();
+                let steps = 0;
+            }
+
+            if (direction = 0) {
+                let nextX = x + 2;
+            }
+
+            if (direction = 1) {
+                let nextY = y + 2;
+            }
+
+            if (direction = 2) {
+                let nextX = x - 2;
+            }
+
+            if (direction = 3) {
+                let nextY = y - 2;
+            }
+
+            // Limites del mapa
+
+            if (nextX < 25) {
+                let blocked = true;
+                let direction = 0;
+            }
+
+            if (nextX > 999) {
+                let blocked = true;
+                let direction = 2;
+            }
+
+            if (nextY < 27) {
+                let blocked = true;
+                let direction = 1;
+            }
+
+            if (nextY > 485) {
+                let blocked = true;
+                let direction = 3;
+            }
+
+            // Obstaculos del escenario
+
+            if (~blocked) {
+                let blocked = world.isBlocked(nextX, nextY);
+            }
+
+            // Otros conejos
+
+            if (~blocked) {
+                let blocked = collidesWith(other1, nextX, nextY);
+            }
+
+            if (~blocked) {
+                let blocked = collidesWith(other2, nextX, nextY);
+            }
+
+            if (~blocked) {
+                let blocked = collidesWith(other3, nextX, nextY);
+            }
+
+            if (blocked) {
+                do chooseDirection();
+                let steps = 0;
+            } else {
+                let x = nextX;
+                let y = nextY;
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // COLISION ENTRE CONEJOS
+    // =====================================
+
+    method boolean collidesWith(Rabbit other,
+                                int nextX, int nextY) {
+
+        var int otherX;
+        var int otherY;
+
+        if (other.isActive()) {
+
+            let otherX = other.getX();
+            let otherY = other.getY();
+
+            if (nextX > (otherX - 12)) {
+                if (nextX < (otherX + 12)) {
+                    if (nextY > (otherY - 12)) {
+                        if (nextY < (otherY + 12)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // RESCATE
+    // =====================================
+
+    method boolean isNear(int playerX, int playerY) {
+
+        if (active) {
+            if (playerX > (x - 12)) {
+                if (playerX < (x + 12)) {
+                    if (playerY > (y - 12)) {
+                        if (playerY < (y + 12)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    method void rescue() {
+        let active = false;
+        return;
+    }
+
+    // =====================================
+    // REINICIAR CON NUEVA SEMILLA
+    // =====================================
+
+    method void reset(int startX, int startY,
+                      int startDirection, int duration,
+                      int seed) {
+
+        let x = startX;
+        let y = startY;
+        let direction = startDirection;
+        let steps = 0;
+        let changeAfter = duration;
+        let randomState = seed;
+        let active = true;
+
+        let randomState = randomState
+                          - ((randomState / 997) * 997);
+
+        do chooseDirection();
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR CONEJO
+    // =====================================
+
+    method void draw(Camera camera) {
+
+        var int sx;
+        var int sy;
+
+        if (active) {
+
+            let sx = x - camera.getX();
+            let sy = y - camera.getY();
+
+            if (sx > 15) {
+                if (sx < 495) {
+                    if (sy > 20) {
+                        if (sy < 235) {
+
+                            do Screen.setColor(true);
+
+                            do Screen.drawCircle(sx, sy, 5);
+                            do Screen.drawCircle(sx+5, sy-3, 4);
+
+                            do Screen.drawCircle(sx+3, sy-8, 2);
+                            do Screen.drawCircle(sx+8, sy-7, 2);
+
+                            do Screen.drawCircle(sx+6, sy-3, 1);
+
+                            do Screen.drawLine(
+                                sx-3, sy+4, sx-4, sy+7
+                            );
+
+                            do Screen.drawLine(
+                                sx+2, sy+4, sx+1, sy+7
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // CONSULTAR POSICION Y ESTADO
+    // =====================================
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method boolean isActive() {
+        return active;
+    }
+}

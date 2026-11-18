@@ -1,0 +1,42 @@
+class Camera {
+
+    field int x;
+    field int y;
+
+    constructor Camera new() {
+        let x = 0;
+        let y = 0;
+        return this;
+    }
+
+    // Seguir al jugador manteniendolo centrado
+    method void follow(int playerX, int playerY) {
+
+        let x = playerX - 256;
+        let y = playerY - 128;
+
+        // Limites del mundo
+        if (x < 0) {
+            let x = 0;
+        }
+        if (x > 512) {
+            let x = 512;
+        }
+        if (y < 0) {
+            let y = 0;
+        }
+        if (y > 256) {
+            let y = 256;
+        }
+
+        return;
+    }
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+}

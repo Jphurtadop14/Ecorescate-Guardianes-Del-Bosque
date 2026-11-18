@@ -1,0 +1,692 @@
+class Fire {
+
+    field int x;
+    field int y;
+    field int timer;
+    field int active;
+    field int burnt;
+    field int seed;
+    field int waitTime;
+
+    // Hasta tres gotas de agua pueden viajar al mismo tiempo.
+    field Array waterX;
+    field Array waterY;
+    field Array waterDX;
+    field Array waterDY;
+    field Array waterActive;
+
+    // Cada incendio necesita dos impactos.
+    field int hitCount;
+    field int score;
+
+    // =====================================
+    // CONSTRUCTOR
+    // =====================================
+
+    constructor Fire new(int initialSeed) {
+
+        let x = 0;
+        let y = 0;
+        let timer = 0;
+        let active = 0;
+        let burnt = 0;
+
+        // Normalizar la semilla para evitar
+        // numeros demasiado grandes o negativos.
+        let seed = Math.abs(initialSeed);
+        let seed = seed - ((seed / 997) * 997);
+
+        let waitTime = 80;
+
+        let waterX = Array.new(3);
+        let waterY = Array.new(3);
+        let waterDX = Array.new(3);
+        let waterDY = Array.new(3);
+        let waterActive = Array.new(3);
+
+        let waterActive[0] = 0;
+        let waterActive[1] = 0;
+        let waterActive[2] = 0;
+
+        let hitCount = 0;
+        let score = 0;
+
+        return this;
+    }
+
+    // =====================================
+    // GENERAR NUMERO PSEUDOALEATORIO
+    // =====================================
+
+    method int randomNumber() {
+
+        // La semilla siempre esta entre 0 y 996.
+        // 996 * 31 + 17 = 30993.
+        // Asi evitamos superar el limite de Jack.
+
+        let seed = (seed * 31) + 17;
+        let seed = seed - ((seed / 997) * 997);
+
+        return seed;
+    }
+
+    // =====================================
+    // ELEGIR CUALQUIER OBJETO INFLAMABLE
+    // =====================================
+
+    method boolean choosePosition(World world) {
+        var int position;
+        var int startPosition;
+        var int attempts;
+        var boolean found;
+
+        let startPosition = randomNumber();
+        let startPosition = startPosition - ((startPosition / 77) * 77);
+        let attempts = 0;
+        let found = false;
+
+        // Se recorren las 77 posiciones desde un punto aleatorio.
+        // Asi no se queda buscando solo entre unos pocos objetos.
+        while ((attempts < 77) & (~found)) {
+            let position = startPosition + attempts;
+            if (position > 76) {
+                let position = position - 77;
+            }
+
+            if (position = 0) { let x = 45; let y = 55; }
+            if (position = 1) { let x = 115; let y = 55; }
+            if (position = 2) { let x = 25; let y = 105; }
+            if (position = 3) { let x = 35; let y = 205; }
+            if (position = 4) { let x = 110; let y = 205; }
+            if (position = 5) { let x = 225; let y = 55; }
+            if (position = 6) { let x = 225; let y = 205; }
+            if (position = 7) { let x = 300; let y = 55; }
+            if (position = 8) { let x = 455; let y = 190; }
+            if (position = 9) { let x = 155; let y = 65; }
+            if (position = 10) { let x = 205; let y = 140; }
+            if (position = 11) { let x = 175; let y = 175; }
+            if (position = 12) { let x = 75; let y = 145; }
+            if (position = 13) { let x = 195; let y = 220; }
+            if (position = 14) { let x = 320; let y = 150; }
+            if (position = 15) { let x = 425; let y = 140; }
+            if (position = 16) { let x = 155; let y = 185; }
+            if (position = 17) { let x = 95; let y = 95; }
+            if (position = 18) { let x = 220; let y = 125; }
+            if (position = 19) { let x = 75; let y = 225; }
+            if (position = 20) { let x = 350; let y = 155; }
+            if (position = 21) { let x = 395; let y = 180; }
+            if (position = 22) { let x = 665; let y = 55; }
+            if (position = 23) { let x = 850; let y = 165; }
+            if (position = 24) { let x = 570; let y = 55; }
+            if (position = 25) { let x = 620; let y = 125; }
+            if (position = 26) { let x = 720; let y = 45; }
+            if (position = 27) { let x = 890; let y = 55; }
+            if (position = 28) { let x = 970; let y = 55; }
+            if (position = 29) { let x = 545; let y = 205; }
+            if (position = 30) { let x = 950; let y = 220; }
+            if (position = 31) { let x = 990; let y = 145; }
+            if (position = 32) { let x = 640; let y = 175; }
+            if (position = 33) { let x = 745; let y = 100; }
+            if (position = 34) { let x = 800; let y = 65; }
+            if (position = 35) { let x = 920; let y = 115; }
+            if (position = 36) { let x = 710; let y = 210; }
+            if (position = 37) { let x = 980; let y = 215; }
+            if (position = 38) { let x = 790; let y = 75; }
+            if (position = 39) { let x = 820; let y = 220; }
+            if (position = 40) { let x = 690; let y = 185; }
+            if (position = 41) { let x = 910; let y = 90; }
+            if (position = 42) { let x = 570; let y = 165; }
+            if (position = 43) { let x = 150; let y = 320; }
+            if (position = 44) { let x = 45; let y = 300; }
+            if (position = 45) { let x = 35; let y = 455; }
+            if (position = 46) { let x = 105; let y = 465; }
+            if (position = 47) { let x = 205; let y = 475; }
+            if (position = 48) { let x = 250; let y = 300; }
+            if (position = 49) { let x = 460; let y = 310; }
+            if (position = 50) { let x = 420; let y = 465; }
+            if (position = 51) { let x = 220; let y = 300; }
+            if (position = 52) { let x = 300; let y = 450; }
+            if (position = 53) { let x = 65; let y = 350; }
+            if (position = 54) { let x = 185; let y = 390; }
+            if (position = 55) { let x = 270; let y = 420; }
+            if (position = 56) { let x = 440; let y = 420; }
+            if (position = 57) { let x = 250; let y = 350; }
+            if (position = 58) { let x = 390; let y = 450; }
+            if (position = 59) { let x = 80; let y = 420; }
+            if (position = 60) { let x = 280; let y = 410; }
+            if (position = 61) { let x = 440; let y = 370; }
+            if (position = 62) { let x = 665; let y = 320; }
+            if (position = 63) { let x = 570; let y = 300; }
+            if (position = 64) { let x = 550; let y = 420; }
+            if (position = 65) { let x = 620; let y = 465; }
+            if (position = 66) { let x = 690; let y = 470; }
+            if (position = 67) { let x = 890; let y = 300; }
+            if (position = 68) { let x = 970; let y = 300; }
+            if (position = 69) { let x = 950; let y = 465; }
+            if (position = 70) { let x = 600; let y = 360; }
+            if (position = 71) { let x = 850; let y = 465; }
+            if (position = 72) { let x = 700; let y = 420; }
+            if (position = 73) { let x = 930; let y = 450; }
+            if (position = 74) { let x = 930; let y = 330; }
+            if (position = 75) { let x = 820; let y = 430; }
+            if (position = 76) { let x = 580; let y = 460; }
+
+            // Solo se excluyen objetos que ya se quemaron por completo.
+            // Si ECO apago el fuego a tiempo, el objeto puede incendiarse otra vez.
+            if (~world.isBurned(x, y)) {
+                let found = true;
+            }
+
+            let attempts = attempts + 1;
+        }
+
+        return found;
+    }
+
+    method void start(World world) {
+        if (active = 0) {
+            if (waitTime = 0) {
+                if (choosePosition(world)) {
+                    let active = 1;
+                    let burnt = 0;
+                    let timer = 100;
+                    let hitCount = 0;
+                } else {
+                    // Ya no quedan objetos disponibles para incendiar.
+                    let waitTime = 100;
+                }
+            }
+        }
+        return;
+    }
+
+    method void update(World world) {
+        if (active = 1) {
+            if (timer > 0) { let timer = timer - 1; }
+            if (timer = 0) {
+                let active = 0;
+                let burnt = 1;
+                do world.burnObject(x, y);
+                let waitTime = 100;
+            }
+        } else {
+            if (waitTime > 0) { let waitTime = waitTime - 1; }
+            do start(world);
+        }
+        return;
+    }
+
+    // =====================================
+    // DISPARAR UNA GOTA DE AGUA
+    // =====================================
+
+    // =====================================
+    // DISPARAR AGUA
+    // =====================================
+
+    method void shoot(Player eco) {
+        var int slot;
+
+        let slot = 0;
+
+        // Buscar una ranura libre entre las tres gotas.
+        while (slot < 3) {
+            if (waterActive[slot] = 0) {
+                let waterX[slot] = eco.getX();
+                let waterY[slot] = eco.getY();
+
+                // La gota viaja en la ultima direccion de ECO.
+                let waterDX[slot] = eco.getFacingX() * 8;
+                let waterDY[slot] = eco.getFacingY() * 8;
+
+                let waterActive[slot] = 1;
+                let slot = 3;
+            } else {
+                let slot = slot + 1;
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // ACTUALIZAR LAS TRES GOTAS
+    // =====================================
+
+    method void updateWater() {
+        var int i;
+        var int distanceX;
+        var int distanceY;
+
+        let i = 0;
+
+        while (i < 3) {
+            if (waterActive[i] = 1) {
+
+                let waterX[i] = waterX[i] + waterDX[i];
+                let waterY[i] = waterY[i] + waterDY[i];
+
+                if (active = 1) {
+                    let distanceX = Math.abs(x - waterX[i]);
+                    let distanceY = Math.abs((y - 14) - waterY[i]);
+
+                    // Un impacto suma 10 puntos.
+                    if (distanceX < 10) {
+                        if (distanceY < 10) {
+                            let score = score + 10;
+                            let hitCount = hitCount + 1;
+                            let waterActive[i] = 0;
+
+                            // El segundo impacto apaga el incendio.
+                            if (hitCount = 2) {
+                                let active = 0;
+                                let burnt = 0;
+                                let timer = 0;
+                                let waitTime = 100;
+                            }
+                        }
+                    }
+                }
+
+                // Si no hay incendio, la gota sigue su recorrido.
+                // Solo desaparece al salir de los limites del mapa.
+
+                // La gota desaparece al salir del mundo.
+                if (waterX[i] < 0) { let waterActive[i] = 0; }
+                if (waterX[i] > 1024) { let waterActive[i] = 0; }
+                if (waterY[i] < 0) { let waterActive[i] = 0; }
+                if (waterY[i] > 512) { let waterActive[i] = 0; }
+            }
+
+            let i = i + 1;
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR LAS GOTAS
+    // =====================================
+
+    method void drawWater(Camera camera) {
+        var int i;
+        var int screenX;
+        var int screenY;
+
+        let i = 0;
+
+        while (i < 3) {
+            if (waterActive[i] = 1) {
+                let screenX = waterX[i] - camera.getX();
+                let screenY = waterY[i] - camera.getY();
+
+                if (screenX > 5) {
+                    if (screenX < 507) {
+                        if (screenY > 5) {
+                            if (screenY < 251) {
+                                do Screen.setColor(true);
+                                do Screen.drawCircle(screenX, screenY, 4);
+                                do Screen.setColor(false);
+                                do Screen.drawCircle(screenX, screenY, 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            let i = i + 1;
+        }
+
+        return;
+    }
+
+    // =====================================
+    // DIBUJAR FUEGO
+    // =====================================
+
+    method void draw(Camera camera) {
+
+        var int screenX;
+        var int screenY;
+        var int fireY;
+
+        if (active = 1) {
+
+            // Convertir coordenadas del mundo
+            // a coordenadas de pantalla.
+
+            let screenX = x - camera.getX();
+            let screenY = y - camera.getY();
+
+            // Elevar la llama sobre el objeto.
+            let fireY = screenY - 14;
+
+            // Comprobar que la llama sea visible.
+
+            if (screenX > 20) {
+                if (screenX < 492) {
+                    if (fireY > 25) {
+                        if (fireY < 235) {
+
+                            do Screen.setColor(true);
+
+                            // Cuerpo de la llama.
+                            do Screen.drawCircle(
+                                screenX, fireY+3, 6
+                            );
+
+                            // Punta izquierda.
+                            do Screen.drawLine(
+                                screenX-5, fireY+4,
+                                screenX-6, fireY-4
+                            );
+
+                            do Screen.drawLine(
+                                screenX-6, fireY-4,
+                                screenX-2, fireY
+                            );
+
+                            // Punta central.
+                            do Screen.drawLine(
+                                screenX-2, fireY,
+                                screenX, fireY-12
+                            );
+
+                            do Screen.drawLine(
+                                screenX, fireY-12,
+                                screenX+3, fireY
+                            );
+
+                            // Punta derecha.
+                            do Screen.drawLine(
+                                screenX+3, fireY,
+                                screenX+6, fireY-5
+                            );
+
+                            do Screen.drawLine(
+                                screenX+6, fireY-5,
+                                screenX+5, fireY+4
+                            );
+
+                            // Base.
+                            do Screen.drawLine(
+                                screenX-5, fireY+4,
+                                screenX+5, fireY+4
+                            );
+
+                            // Interior blanco para distinguir
+                            // el cuerpo de la llama.
+                            do Screen.setColor(false);
+
+                            do Screen.drawCircle(
+                                screenX, fireY+4, 2
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+    // =====================================
+    // CRUCETA INDICADORA
+    // =====================================
+
+    method void drawIndicator(Player eco) {
+
+        var int dx;
+        var int dy;
+        var int markerX;
+        var int markerY;
+        var int absX;
+        var int absY;
+
+        if (active = 1) {
+
+            // Diferencia entre ECO y el incendio.
+            let dx = x - eco.getX();
+            let dy = y - eco.getY();
+
+            let absX = Math.abs(dx);
+            let absY = Math.abs(dy);
+
+            // Centro fijo de la cruceta.
+            let markerX = 480;
+            let markerY = 25;
+
+            // DIRECCION HORIZONTAL
+
+            if (absX > (absY * 2)) {
+
+                if (dx > 0) {
+                    let markerX = 490;
+                } else {
+                    let markerX = 470;
+                }
+
+            } else {
+
+                // DIRECCION VERTICAL
+
+                if (absY > (absX * 2)) {
+
+                    if (dy > 0) {
+                        let markerY = 35;
+                    } else {
+                        let markerY = 15;
+                    }
+
+                } else {
+
+                    // DIRECCION DIAGONAL
+
+                    if (dx > 0) {
+                        let markerX = 487;
+                    } else {
+                        let markerX = 473;
+                    }
+
+                    if (dy > 0) {
+                        let markerY = 32;
+                    } else {
+                        let markerY = 18;
+                    }
+                }
+            }
+
+            // Dibujar cruceta.
+
+            do Screen.setColor(true);
+
+            do Screen.drawLine(
+                470, 25, 490, 25
+            );
+
+            do Screen.drawLine(
+                480, 15, 480, 35
+            );
+
+            // Centro.
+            do Screen.drawCircle(
+                480, 25, 2
+            );
+
+            // Punto de direccion.
+            do Screen.drawCircle(
+                markerX, markerY, 3
+            );
+        }
+
+        return;
+    }
+
+    // =====================================
+    // CONSULTAR ESTADO
+    // =====================================
+
+    method boolean isActive() {
+
+        if (active = 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    method boolean isBurnt() {
+
+        if (burnt = 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // =====================================
+    // CONSULTAR POSICION Y TIEMPO
+    // =====================================
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method int getTimer() {
+        return timer;
+    }
+
+    // =====================================
+    // APAGAR INCENDIO
+    // =====================================
+
+    method void extinguish() {
+
+        if (active = 1) {
+
+            let active = 0;
+            let burnt = 0;
+            let timer = 0;
+            let waitTime = 100;
+        }
+
+        return;
+    }
+
+    method int getScore() {
+        return score;
+    }
+
+    // Sumar puntos por rescatar animales.
+    method void addScore(int points) {
+        let score = score + points;
+        return;
+    }
+
+    // Gastar puntos para activar una habilidad.
+    // Devuelve true si habia puntos suficientes.
+    method boolean spendScore(int points) {
+        if ((score > points) | (score = points)) {
+            let score = score - points;
+            return true;
+        }
+        return false;
+    }
+
+    // Dibujar un digito con segmentos, sin crear cadenas.
+    method void drawDigit(int digit, int px, int py) {
+
+        do Screen.setColor(true);
+
+        // Segmento superior.
+        if ((digit = 0) | (digit = 2) | (digit = 3) |
+            (digit = 5) | (digit = 6) | (digit = 7) |
+            (digit = 8) | (digit = 9)) {
+            do Screen.drawLine(px+1, py, px+7, py);
+        }
+
+        // Segmento superior derecho.
+        if ((digit = 0) | (digit = 1) | (digit = 2) |
+            (digit = 3) | (digit = 4) | (digit = 7) |
+            (digit = 8) | (digit = 9)) {
+            do Screen.drawLine(px+8, py+1, px+8, py+7);
+        }
+
+        // Segmento inferior derecho.
+        if ((digit = 0) | (digit = 1) | (digit = 3) |
+            (digit = 4) | (digit = 5) | (digit = 6) |
+            (digit = 7) | (digit = 8) | (digit = 9)) {
+            do Screen.drawLine(px+8, py+9, px+8, py+15);
+        }
+
+        // Segmento inferior.
+        if ((digit = 0) | (digit = 2) | (digit = 3) |
+            (digit = 5) | (digit = 6) | (digit = 8) |
+            (digit = 9)) {
+            do Screen.drawLine(px+1, py+16, px+7, py+16);
+        }
+
+        // Segmento inferior izquierdo.
+        if ((digit = 0) | (digit = 2) | (digit = 6) |
+            (digit = 8)) {
+            do Screen.drawLine(px, py+9, px, py+15);
+        }
+
+        // Segmento superior izquierdo.
+        if ((digit = 0) | (digit = 4) | (digit = 5) |
+            (digit = 6) | (digit = 8) | (digit = 9)) {
+            do Screen.drawLine(px, py+1, px, py+7);
+        }
+
+        // Segmento central.
+        if ((digit = 2) | (digit = 3) | (digit = 4) |
+            (digit = 5) | (digit = 6) | (digit = 8) |
+            (digit = 9)) {
+            do Screen.drawLine(px+1, py+8, px+7, py+8);
+        }
+
+        return;
+    }
+
+    // Mostrar la puntuacion usando segmentos graficos.
+    method void drawScore() {
+        var int value;
+        var int digit;
+        var int place;
+        var int px;
+        var int i;
+
+        let value = score;
+        let place = 1000;
+        let px = 12;
+        let i = 0;
+
+        while (i < 4) {
+            let digit = value / place;
+            let value = value - (digit * place);
+
+            do drawDigit(digit, px, 8);
+
+            let px = px + 12;
+            let place = place / 10;
+            let i = i + 1;
+        }
+
+        return;
+    }
+
+    // =====================================
+    // LIBERAR MEMORIA
+    // =====================================
+
+    method void dispose() {
+
+        do Memory.deAlloc(this);
+
+        return;
+    }
+}

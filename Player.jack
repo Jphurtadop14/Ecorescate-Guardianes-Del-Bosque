@@ -1,0 +1,154 @@
+class Player {
+
+    field int x;
+    field int y;
+    field int walkFrame;
+    field int facingX;
+    field int facingY;
+
+    // Estado del salto.
+    field int jumpActive;
+    field int jumpFrame;
+    field int jumpHeight;
+
+    constructor Player new(int startX, int startY) {
+        let x = startX;
+        let y = startY;
+        let walkFrame = 0;
+
+        // Direccion inicial: derecha.
+        let facingX = 1;
+        let facingY = 0;
+
+        let jumpActive = 0;
+        let jumpFrame = 0;
+        let jumpHeight = 0;
+
+        return this;
+    }
+
+    // Dibujar a ECO. Durante el salto se eleva visualmente.
+    method void draw(Camera camera) {
+
+        var int sx;
+        var int sy;
+
+        let sx = x - camera.getX();
+        let sy = y - camera.getY() - jumpHeight;
+
+        do Screen.setColor(true);
+
+        if (walkFrame = 0) {
+            do Screen.drawRectangle(sx-12, sy-7, sx-9, sy+1);
+            do Screen.drawCircle(sx-11, sy-8, 2);
+            do Screen.drawRectangle(sx+9, sy-1, sx+12, sy+7);
+            do Screen.drawCircle(sx+11, sy+8, 2);
+            do Screen.drawRectangle(sx-5, sy+10, sx-2, sy+16);
+            do Screen.drawRectangle(sx+2, sy+7, sx+5, sy+13);
+        } else {
+            do Screen.drawRectangle(sx-12, sy-1, sx-9, sy+7);
+            do Screen.drawCircle(sx-11, sy+8, 2);
+            do Screen.drawRectangle(sx+9, sy-7, sx+12, sy+1);
+            do Screen.drawCircle(sx+11, sy-8, 2);
+            do Screen.drawRectangle(sx-5, sy+7, sx-2, sy+13);
+            do Screen.drawRectangle(sx+2, sy+10, sx+5, sy+13);
+        }
+
+        do Screen.drawRectangle(sx-7, sy-8, sx+7, sy+8);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(sx-5, sy-6, sx+5, sy+6);
+        do Screen.setColor(true);
+        do Screen.drawCircle(sx-3, sy-4, 2);
+        do Screen.drawCircle(sx+3, sy-4, 2);
+        do Screen.drawCircle(sx, sy+2, 2);
+
+        return;
+    }
+
+    // Mover a ECO y recordar la ultima direccion.
+    // En el aire puede atravesar arboles y rocas.
+    method void move(int dx, int dy, World world) {
+
+        var int nextX;
+        var int nextY;
+        var boolean blocked;
+
+        if (dx > 0) {
+            let facingX = 1;
+            let facingY = 0;
+        }
+        if (dx < 0) {
+            let facingX = -1;
+            let facingY = 0;
+        }
+        if (dy > 0) {
+            let facingX = 0;
+            let facingY = 1;
+        }
+        if (dy < 0) {
+            let facingX = 0;
+            let facingY = -1;
+        }
+
+        let nextX = x + dx;
+        let nextY = y + dy;
+
+        if (jumpActive = 1) {
+            let blocked = world.isBlockedDuringJump(nextX, nextY);
+        } else {
+            let blocked = world.isBlocked(nextX, nextY);
+        }
+
+        if (nextX < 17) { let blocked = true; }
+        if (nextX > 1007) { let blocked = true; }
+        if (nextY < 17) { let blocked = true; }
+        if (nextY > 495) { let blocked = true; }
+
+        if (~blocked) {
+            let x = nextX;
+            let y = nextY;
+            let walkFrame = 1 - walkFrame;
+        }
+
+        return;
+    }
+
+    // Iniciar el salto. La puntuacion se descuenta desde Main/Fire.
+    method void startJump() {
+        if (jumpActive = 0) {
+            let jumpActive = 1;
+            let jumpFrame = 0;
+            let jumpHeight = 0;
+        }
+        return;
+    }
+
+    // Actualizar la trayectoria parabolica del salto.
+    // Dura 20 ciclos y alcanza 25 pixeles de altura.
+    method void updateJump() {
+        if (jumpActive = 1) {
+            let jumpFrame = jumpFrame + 1;
+
+            if (jumpFrame < 20) {
+                let jumpHeight = (jumpFrame * (20 - jumpFrame)) / 4;
+            } else {
+                let jumpHeight = 0;
+                let jumpFrame = 0;
+                let jumpActive = 0;
+            }
+        }
+        return;
+    }
+
+    method boolean isJumping() {
+        if (jumpActive = 1) {
+            return true;
+        }
+        return false;
+    }
+
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getFacingX() { return facingX; }
+    method int getFacingY() { return facingY; }
+}
