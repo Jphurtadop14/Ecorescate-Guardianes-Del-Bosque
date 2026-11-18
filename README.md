@@ -68,7 +68,7 @@ El proyecto puede abrirse y ejecutarse utilizando el entorno Nand2Tetris. Los ar
 
 🎥 Video de demostración
 
-Enlace al video de YouTube:
+Enlace al video de YouTube: https://www.youtube.com/watch?v=Qs1MzRqAqOI
 
 [PENDIENTE: agregar aquí el enlace del video de demostración del juego].
 
